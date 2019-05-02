@@ -105,7 +105,7 @@ oer_serialize_length(size_t length, asn_app_consume_bytes_f *cb,
         add = -1;
     } else {
         pstart = (const uint8_t *)&length;
-        pend = pstart + sizeof(length);
+        pend = pstart + sizeof(length) - 1;
         add = 1;
     }
 
