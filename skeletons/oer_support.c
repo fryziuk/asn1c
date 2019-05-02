@@ -29,7 +29,9 @@ oer_fetch_length(const void *bufptr, size_t size, size_t *len_r) {
     }
 
     first_byte = *(const uint8_t *)bufptr;
-    if((first_byte & 0x80) == 0) {   /* Short form */
+
+    // Fixed by Virgil Security, Inc. Added (first_byte & 0x7f) != 0)
+    if((first_byte & 0x80) == 0 && ((first_byte & 0x7f) != 0)) {   /* Short form */
         *len_r = first_byte; /* 0..127 */
         return 1;
     }
@@ -64,6 +66,12 @@ oer_fetch_length(const void *bufptr, size_t size, size_t *len_r) {
 
     *len_r = len;
     assert(len_len + 1 == (size_t)(bend - (const uint8_t *)bufptr));
+    // Fixed by Virgil Security, Inc.
+    if((len == 0) && (size == len_len + 1)) {
+        *len_r = 0;
+        return -1;
+    }
+    // end fix
     return len_len + 1;
 }
 
